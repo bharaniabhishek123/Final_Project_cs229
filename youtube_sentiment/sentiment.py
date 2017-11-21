@@ -75,44 +75,59 @@ def read_data(data):
     return data_comments, data_y
 
 def main():
-    #generate_sentiments('../data/youtube/USComments.csv', '../data/youtube/USComments-sentiments.csv')
-    #comments = pd.read_csv('../data/youtube/USComments-sentiments.csv', encoding='utf8', error_bad_lines=False);
-    #split_data(comments, 0.8, '../data/youtube/USComments-train.csv', '../data/youtube/USComments-test.csv')
+    #generate_sentiments('../data/youtube/UScomments.csv', '../data/youtube/USComments-sentiments.csv')
+    #us_comments = pd.read_csv('../data/youtube/USComments-sentiments.csv', encoding='utf8', error_bad_lines=False);
+    #split_data(us_comments, 0.8, '../data/youtube/USComments-train.csv', '../data/youtube/USComments-test.csv')
+
+    #generate_sentiments('../data/youtube/GBcomments.csv', '../data/youtube/GBComments-sentiments.csv')
+    #gb_comments = pd.read_csv('../data/youtube/GBComments-sentiments.csv', encoding='utf8', error_bad_lines=False);
+    #split_data(gb_comments, 0.8, '../data/youtube/GBComments-train.csv', '../data/youtube/GBComments-test.csv')
 
     train = pd.read_csv('../data/youtube/USComments-train.csv', encoding='utf8', error_bad_lines=False);
     train_comments, train_y = read_data(train)
     test = pd.read_csv('../data/youtube/USComments-test.csv', encoding='utf8', error_bad_lines=False);
     test_comments, test_y = read_data(test)
+    dev = pd.read_csv('../data/youtube/GBComments-test.csv', encoding='utf8', error_bad_lines=False);
+    dev_comments, dev_y = read_data(dev)
 
-    # text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', RidgeClassifier())])
-    # text_clf.fit(train_comments, train_y)
-    # predicted = text_clf.predict(test_comments)
-    # accuracy = np.mean(predicted == test_y)
-    # print ('RidgeClassifier Accuracy = ', accuracy)
-    #
-    # text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', DecisionTreeClassifier(random_state=0))])
-    # text_clf.fit(train_comments, train_y)
-    # predicted = text_clf.predict(test_comments)
-    # accuracy = np.mean(predicted == test_y)
-    # print ('DecisionTreeClassifier Accuracy = ', accuracy)
-    #
-    # text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', RandomForestClassifier(max_depth=2, random_state=0))])
-    # text_clf.fit(train_comments, train_y)
-    # predicted = text_clf.predict(test_comments)
-    # accuracy = np.mean(predicted == test_y)
-    # print ('RandomForestClassifier Accuracy = ', accuracy)
+    text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', RidgeClassifier())])
+    text_clf.fit(train_comments, train_y)
+    predicted = text_clf.predict(test_comments)
+    test_accuracy = np.mean(predicted == test_y)
+    print ('RidgeClassifier Test Accuracy = ', test_accuracy)
+    predicted = text_clf.predict(dev_comments)
+    dev_accuracy = np.mean(predicted == dev_y)
+    print ('RidgeClassifier Dev Accuracy = ', dev_accuracy)
 
     text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', BernoulliNB())])
     text_clf.fit(train_comments, train_y)
     predicted = text_clf.predict(test_comments)
-    accuracy = np.mean(predicted == test_y)
-    print ('BernoulliNB Accuracy = ', accuracy)
+    test_accuracy = np.mean(predicted == test_y)
+    print ('BernoulliNB Test Accuracy = ', test_accuracy)
+    predicted = text_clf.predict(dev_comments)
+    dev_accuracy = np.mean(predicted == dev_y)
+    print ('BernoulliNB Dev Accuracy = ', dev_accuracy)
 
     text_clf = Pipeline([('vect', CountVectorizer()),('tfidf', TfidfTransformer()),('clf', LinearSVC(random_state=0))])
     text_clf.fit(train_comments, train_y)
     predicted = text_clf.predict(test_comments)
-    accuracy = np.mean(predicted == test_y)
-    print ('LinearSVC Accuracy = ', accuracy)
+    test_accuracy = np.mean(predicted == test_y)
+    print ('LinearSVC Test Accuracy = ', test_accuracy)
+    predicted = text_clf.predict(dev_comments)
+    dev_accuracy = np.mean(predicted == dev_y)
+    print ('LinearSVC Dev Accuracy = ', dev_accuracy)
+
+    # text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', DecisionTreeClassifier(random_state=0))])
+    # text_clf.fit(train_comments, train_y)
+    # predicted = text_clf.predict(test_comments)
+    # test_accuracy = np.mean(predicted == test_y)
+    # print ('DecisionTreeClassifier Test Accuracy = ', test_accuracy)
+    #
+    # text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', RandomForestClassifier(max_depth=2, random_state=0))])
+    # text_clf.fit(train_comments, train_y)
+    # predicted = text_clf.predict(test_comments)
+    # test_accuracy = np.mean(predicted == test_y)
+    # print ('RandomForestClassifier Test Accuracy = ', test_accuracy)
 
 
 if __name__ == '__main__':
