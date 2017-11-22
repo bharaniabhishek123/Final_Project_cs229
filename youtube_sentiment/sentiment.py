@@ -92,6 +92,9 @@ def main():
 
     text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', RidgeClassifier())])
     text_clf.fit(train_comments, train_y)
+    predicted = text_clf.predict(train_comments)
+    train_accuracy = np.mean(predicted == train_y)
+    print ('RidgeClassifier Train Accuracy = ', train_accuracy)
     predicted = text_clf.predict(test_comments)
     test_accuracy = np.mean(predicted == test_y)
     print ('RidgeClassifier Test Accuracy = ', test_accuracy)
@@ -101,6 +104,9 @@ def main():
 
     text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', TfidfTransformer()), ('clf', BernoulliNB())])
     text_clf.fit(train_comments, train_y)
+    predicted = text_clf.predict(train_comments)
+    train_accuracy = np.mean(predicted == train_y)
+    print ('BernoulliNB Train Accuracy = ', train_accuracy)
     predicted = text_clf.predict(test_comments)
     test_accuracy = np.mean(predicted == test_y)
     print ('BernoulliNB Test Accuracy = ', test_accuracy)
@@ -110,6 +116,9 @@ def main():
 
     text_clf = Pipeline([('vect', CountVectorizer()),('tfidf', TfidfTransformer()),('clf', LinearSVC(random_state=0))])
     text_clf.fit(train_comments, train_y)
+    predicted = text_clf.predict(train_comments)
+    train_accuracy = np.mean(predicted == train_y)
+    print ('LinearSVC Train Accuracy = ', train_accuracy)
     predicted = text_clf.predict(test_comments)
     test_accuracy = np.mean(predicted == test_y)
     print ('LinearSVC Test Accuracy = ', test_accuracy)
