@@ -47,7 +47,7 @@ We use TF-IDF to convert comments into feature vectors. In this technique, stop 
 \subsection{Experiments and Evaluation}
 \label{sec:experiments}
 In order to measure the performance of different classification techniques on the YouTube data, we split the data from US comments into train and test subsets. To generate the train set, we randomly choose $80\%$ of the comments from each of the three categories. The remaining comments form the test set. We use $20\%$ of the GB comments as development set. 
-We ran three different classification techniques on the data, including Ridge Classifier, Bernoulli Naive Bayes and SVM. Table~\ref{tab:accuracy} shows the accuracy measured on test and dev sets. Naive Bayes classifier has the worst performance among all methods. This result is predictable as the conditional independence condition required by the Naive Bayes classifier is not satisfied in this dataset. In particular, the probability of two words happening in a comment given the category of the comment are not independent from one another. On this dataset, Ridge classifer has the best performance.
+We ran three different classification techniques on the data, including Ridge Classifier, Bernoulli Naive Bayes and SVM. Table~\ref{tab:accuracy} shows the accuracy measured on test and dev sets. Naive Bayes classifier has the worst performance among all methods. This result is predictable as the conditional independence condition required by the Naive Bayes classifier is not satisfied in this dataset. In particular, the probability of two words happening in a comment given the category of the comment are not independent from one another. On this dataset, SVM classifier has the best performance.
 
 \begin{table}%
 \centering
