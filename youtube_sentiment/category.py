@@ -4,7 +4,6 @@ from sklearn.svm import LinearSVC
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
-from sklearn.calibration import calibration_curve
 from timeit import default_timer as timer
 from sklearn import decomposition
 import matplotlib.pyplot as plt
@@ -55,9 +54,6 @@ def predict(X, Y, clf):
 
 
 def predict_categories(train, test):
-    plt.figure(figsize=(10, 10))
-    ax1 = plt.subplot2grid((3, 1), (0, 0), rowspan=2)
-    ax1.plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
 
     y_column = 'category_id'
     train_comments, train_y = read_data(train, y_column)

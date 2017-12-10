@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
 from sklearn import decomposition
 from timeit import default_timer as timer
+from sklearn.calibration import calibration_curve
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -128,44 +129,111 @@ def predict(X, Y, clf):
     return accuracy
 
 
-def predict_sentiments(train, test, dev):
+def add_to_plot(X_test, y_test, name, clf, ax1):
+    if hasattr(clf, "predict_proba"):
+        prob_pos = clf.predict_proba(X_test)[:, 1]
+    else:  # use decision function
+        prob_pos = clf.decision_function(X_test)
+        prob_pos = \
+            (prob_pos - prob_pos.min()) / (prob_pos.max() - prob_pos.min())
+    fraction_of_positives, mean_predicted_value = calibration_curve(y_test, prob_pos, n_bins=10)
+
+    ax1.plot(mean_predicted_value, fraction_of_positives, "s-", label="%s" % (name,))
+
+
+def predict_sentiments2(train, dev, test, dimensions=None, calibration=False):
+    if calibration:
+        plt.figure()
+        ax1 = plt.subplot2grid((1, 1), (0, 0), rowspan=1)
+        ax1.plot([0, 1], [0, 1], "k:", label="Perfectly calibrated")
+
     y_column = 'binary_sentiment'
     train_comments, train_y = read_data(train, y_column)
-    test_comments, test_y = read_data(test, y_column)
+    vectorizer = CountVectorizer()
+    count_vector = vectorizer.fit_transform(train_comments)
+    transformer = TfidfTransformer()
+    train_vector = transformer.fit_transform(count_vector)
+
     dev_comments, dev_y = read_data(dev, y_column)
+    dev_count_vector = vectorizer.transform(dev_comments)
+    dev_vector = transformer.transform(dev_count_vector)
+    test_comments, test_y = read_data(test, y_column)
+    test_count_vector = vectorizer.transform(test_comments)
+    test_vector = transformer.transform(test_count_vector)
+    if dimensions is not None:
+        svd = decomposition.TruncatedSVD(n_components=dimensions)
+        train_vector = svd.fit_transform(train_vector)
+        test_vector = svd.fit_transform(test_vector)
+        dev_vector = svd.fit_transform(dev_vector)
+
+    for name, clf in [('LogisticRegression', LogisticRegression(solver='newton-cg', multi_class='multinomial')),
+                      ('RidgeClassifier', RidgeClassifier()),
+                      ('BernoulliNB', BernoulliNB()),
+                      ('LinearSVC', LinearSVC(random_state=0))]:
+        print('Fitting %s' % name)
+        start = timer()
+        clf.fit(train_vector, train_y)
+        print('Training time of %s = %f' % (name, timer() - start))
+        if calibration:
+            add_to_plot(dev_vector, dev_y, name, clf, ax1)
+        for vector, y, data_type in [(train_vector, train_y, 'Train'),
+                                     (dev_vector, dev_y, 'Dev'),
+                                     (test_vector, test_y, 'Test')]:
+            predicted = clf.predict(vector)
+            accuracy = np.mean(predicted == y)
+            print('%s %s Accuracy = %f' % (name, data_type, accuracy))
+
+    if calibration:
+        ax1.set_ylabel("Fraction of positives")
+        ax1.set_ylim([-0.05, 1.05])
+        ax1.legend(loc="lower right")
+        ax1.set_title('Calibration plots  (reliability curve)')
+        plt.tight_layout()
+        plt.savefig('calibration.png')
+        plt.show()
+
+
+
+def predict_sentiments(train, dev, test):
+    y_column = 'binary_sentiment'
+    train_comments, train_y = read_data(train, y_column)
+    dev_comments, dev_y = read_data(dev, y_column)
+    test_comments, test_y = read_data(test, y_column)
+
 
     dimensions = None
     clf = fit_clf(train_comments, train_y, LogisticRegression(solver='newton-cg', multi_class='multinomial'), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('LogisticRegression Train Accuracy = ', train_accuracy)
-    test_accuracy = predict(test_comments, test_y, clf)
-    print ('LogisticRegression Dev Accuracy = ', test_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
-    print ('LogisticRegression Test Accuracy = ', dev_accuracy)
+    print ('LogisticRegression Dev Accuracy = ', dev_accuracy)
+
+    test_accuracy = predict(test_comments, test_y, clf)
+    print ('LogisticRegression Test Accuracy = ', test_accuracy)
 
     clf = fit_clf(train_comments, train_y, RidgeClassifier(), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('RidgeClassifier Train Accuracy = ', train_accuracy)
-    test_accuracy = predict(test_comments, test_y, clf)
-    print ('RidgeClassifier Dev Accuracy = ', test_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
-    print ('RidgeClassifier Test Accuracy = ', dev_accuracy)
+    print ('RidgeClassifier Dev Accuracy = ', dev_accuracy)
+    test_accuracy = predict(test_comments, test_y, clf)
+    print ('RidgeClassifier Test Accuracy = ', test_accuracy)
 
     clf = fit_clf(train_comments, train_y, BernoulliNB(), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('BernoulliNB Train Accuracy = ', train_accuracy)
-    test_accuracy = predict(test_comments, test_y, clf)
-    print ('BernoulliNB Dev Accuracy = ', test_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
-    print ('BernoulliNB Test Accuracy = ', dev_accuracy)
+    print ('BernoulliNB Dev Accuracy = ', dev_accuracy)
+    test_accuracy = predict(test_comments, test_y, clf)
+    print ('BernoulliNB Test Accuracy = ', test_accuracy)
 
     clf = fit_clf(train_comments, train_y, LinearSVC(random_state=0), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('LinearSVC Train Accuracy = ', train_accuracy)
-    test_accuracy = predict(test_comments, test_y, clf)
-    print ('LinearSVC Dev Accuracy = ', test_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
-    print ('LinearSVC Test Accuracy = ', dev_accuracy)
+    print ('LinearSVC Dev Accuracy = ', dev_accuracy)
+    test_accuracy = predict(test_comments, test_y, clf)
+    print ('LinearSVC Test Accuracy = ', test_accuracy)
 
 
 def main():
@@ -191,10 +259,17 @@ def main():
     # test.to_csv('../data/youtube/USComments-test-full.csv', encoding='utf8')
 
     train = pd.read_csv('../data/youtube/USComments-train-full.csv', encoding='utf8', error_bad_lines=False)
-    test = pd.read_csv('../data/youtube/USComments-test-full.csv', encoding='utf8', error_bad_lines=False)
-    dev = pd.read_csv('../data/youtube/GBComments-test.csv', encoding='utf8', error_bad_lines=False)
+    dev = pd.read_csv('../data/youtube/USComments-test-full.csv', encoding='utf8', error_bad_lines=False)
+    test = pd.read_csv('../data/youtube/GBComments-test.csv', encoding='utf8', error_bad_lines=False)
 
-    predict_sentiments(train, test, dev)
+    #predict_sentiments(train, dev, test)
+    calibration = False
+    dimensions = None
+    if calibration:
+        train = train[train.binary_sentiment != 0]
+        dev = dev[dev.binary_sentiment != 0]
+        test = test[test.binary_sentiment != 0]
+    predict_sentiments2(train, dev, test, dimensions=dimensions, calibration=calibration)
 
 
 if __name__ == '__main__':
