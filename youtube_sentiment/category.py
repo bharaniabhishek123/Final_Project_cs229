@@ -6,7 +6,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
 from timeit import default_timer as timer
 from sklearn import decomposition
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import sys
@@ -43,7 +42,7 @@ def fit_clf(X, Y, classifier, dimensions=None):
                              ('svd', svd), ('clf', classifier)])
     text_clf.fit(X, Y)
     end = timer()
-    print('Execution time = ', end - start)
+    print('Execution time = %d' % end - start)
     return text_clf
 
 
@@ -53,42 +52,54 @@ def predict(X, Y, clf):
     return accuracy
 
 
-def predict_categories(train, test):
+def predict_categories(train, dev, test):
 
     y_column = 'category_id'
     train_comments, train_y = read_data(train, y_column)
+    dev_comments, dev_y = read_data(dev, y_column)
     test_comments, test_y = read_data(test, y_column)
 
     dimensions = None
-    clf = fit_clf(train_comments, train_y, LogisticRegression(solver='newton-cg', multi_class='multinomial', tol=0.01, max_iter=20), dimensions)
+    clf = fit_clf(train_comments, train_y, LogisticRegression(solver='newton-cg', multi_class='multinomial', tol=0.01, max_iter=30), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('LogisticRegression Train Accuracy = ', train_accuracy)
+    dev_accuracy = predict(dev_comments, dev_y, clf)
+    print ('LogisticRegression Dev Accuracy = ', dev_accuracy)
     test_accuracy = predict(test_comments, test_y, clf)
-    print ('LogisticRegression Dev Accuracy = ', test_accuracy)
+    print ('LogisticRegression Test Accuracy = ', test_accuracy)
 
-    clf = fit_clf(train_comments, train_y, RidgeClassifier(), dimensions)
+    clf = fit_clf(train_comments, train_y, RidgeClassifier(), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('RidgeClassifier Train Accuracy = ', train_accuracy)
+    dev_accuracy = predict(dev_comments, dev_y, clf)
+    print ('RidgeClassifier Dev Accuracy = ', dev_accuracy)
     test_accuracy = predict(test_comments, test_y, clf)
-    print ('RidgeClassifier Dev Accuracy = ', test_accuracy)
+    print ('RidgeClassifier Test Accuracy = ', test_accuracy)
 
-    clf = fit_clf(train_comments, train_y, BernoulliNB(), dimensions)
+    clf = fit_clf(train_comments, train_y, BernoulliNB(), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('BernoulliNB Train Accuracy = ', train_accuracy)
+    dev_accuracy = predict(dev_comments, dev_y, clf)
+    print ('BernoulliNB Dev Accuracy = ', dev_accuracy)
     test_accuracy = predict(test_comments, test_y, clf)
-    print ('BernoulliNB Dev Accuracy = ', test_accuracy)
+    print ('BernoulliNB Test Accuracy = ', test_accuracy)
 
-    clf = fit_clf(train_comments, train_y, LinearSVC(random_state=0), dimensions)
+    clf = fit_clf(train_comments, train_y, LinearSVC(random_state=0), dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('LinearSVC Train Accuracy = ', train_accuracy)
+    dev_accuracy = predict(dev_comments, dev_y, clf)
+    print ('LinearSVC Dev Accuracy = ', dev_accuracy)
     test_accuracy = predict(test_comments, test_y, clf)
-    print ('LinearSVC Dev Accuracy = ', test_accuracy)
+    print ('LinearSVC Test Accuracy = ', test_accuracy)
 
 
 def main():
     train = pd.read_csv('../data/youtube/USComments-train-full.csv', encoding='utf8', error_bad_lines=False)
-    test = pd.read_csv('../data/youtube/USComments-test-full.csv', encoding='utf8', error_bad_lines=False)
-    predict_categories(train, test)
+    test_full = pd.read_csv('../data/youtube/USComments-test-full.csv', encoding='utf8', error_bad_lines=False)
+    middle = test_full.shape[0] / 2
+    dev = test_full.iloc[0:middle]
+    test = test_full.iloc[middle:]
+    predict_categories(train, dev, test)
 
 
 if __name__ == '__main__':
