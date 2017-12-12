@@ -30,19 +30,20 @@ def read_data(data, y_column):
     return data_comments, data_y
 
 
-def fit_clf(X, Y, classifier, dimensions=None):
+def fit_clf(X, Y, classifier, name, dimensions=None):
+    print('Fitting %s' % name)
     start = timer()
     tfidf = TfidfTransformer()
-    svd = decomposition.TruncatedSVD(n_components=dimensions)
     if dimensions is None:
         text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', tfidf),
                              ('clf', classifier)])
     else:
+        svd = decomposition.TruncatedSVD(n_components=dimensions)
         text_clf = Pipeline([('vect', CountVectorizer()), ('tfidf', tfidf),
                              ('svd', svd), ('clf', classifier)])
     text_clf.fit(X, Y)
     end = timer()
-    print('Execution time = %d' % end - start)
+    print('Execution time = %f' % (end - start))
     return text_clf
 
 
@@ -60,7 +61,7 @@ def predict_categories(train, dev, test):
     test_comments, test_y = read_data(test, y_column)
 
     dimensions = None
-    clf = fit_clf(train_comments, train_y, LogisticRegression(solver='newton-cg', multi_class='multinomial', tol=0.01, max_iter=30), dimensions=dimensions)
+    clf = fit_clf(train_comments, train_y, LogisticRegression(solver='newton-cg', multi_class='multinomial', tol=0.01, max_iter=30), 'LogisticRegression', dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('LogisticRegression Train Accuracy = ', train_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
@@ -68,7 +69,7 @@ def predict_categories(train, dev, test):
     test_accuracy = predict(test_comments, test_y, clf)
     print ('LogisticRegression Test Accuracy = ', test_accuracy)
 
-    clf = fit_clf(train_comments, train_y, RidgeClassifier(), dimensions=dimensions)
+    clf = fit_clf(train_comments, train_y, RidgeClassifier(), 'RidgeClassifier', dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('RidgeClassifier Train Accuracy = ', train_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
@@ -76,7 +77,7 @@ def predict_categories(train, dev, test):
     test_accuracy = predict(test_comments, test_y, clf)
     print ('RidgeClassifier Test Accuracy = ', test_accuracy)
 
-    clf = fit_clf(train_comments, train_y, BernoulliNB(), dimensions=dimensions)
+    clf = fit_clf(train_comments, train_y, BernoulliNB(), 'BernoulliNB', dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('BernoulliNB Train Accuracy = ', train_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
@@ -84,7 +85,7 @@ def predict_categories(train, dev, test):
     test_accuracy = predict(test_comments, test_y, clf)
     print ('BernoulliNB Test Accuracy = ', test_accuracy)
 
-    clf = fit_clf(train_comments, train_y, LinearSVC(random_state=0), dimensions=dimensions)
+    clf = fit_clf(train_comments, train_y, LinearSVC(random_state=0), 'LinearSVC', dimensions=dimensions)
     train_accuracy = predict(train_comments, train_y, clf)
     print ('LinearSVC Train Accuracy = ', train_accuracy)
     dev_accuracy = predict(dev_comments, dev_y, clf)
