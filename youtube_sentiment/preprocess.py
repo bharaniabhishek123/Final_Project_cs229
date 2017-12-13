@@ -137,7 +137,26 @@ def split_clean_videos(input_file, ratio):
     test_videos.to_csv(input_file_name + '_test.csv', encoding='utf8')
 
 
+def split_clean_videos(input_file, ratio1, ratio2):
+    df = pd.read_csv(input_file, encoding='utf8', error_bad_lines=False)
+    df = shuffle(df)
+    input_file_name = os.path.splitext(input_file)[0]
+    index1 = int(floor(df.shape[0] * ratio1))
+    index2 = int(floor(df.shape[0] * (ratio1 + ratio2)))
+    train_videos = df.iloc[0:index1]
+    train_videos.to_csv(input_file_name + '_train.csv', encoding='utf8')
+    dev_videos = df.iloc[index1:index2]
+    dev_videos.to_csv(input_file_name + '_dev.csv', encoding='utf8')
+    test_videos = df.iloc[index2:]
+    test_videos.to_csv(input_file_name + '_test.csv', encoding='utf8')
+
+
 def main():
+    # Split USVideos_clean into train, dev and test
+    split_clean_videos('../data/youtube/USvideos_clean.csv', 0.7, 0.15)
+    import sys
+    sys.exit(0)
+
     # Split GBVideos_clean into train and test
     split_clean_videos('../data/youtube/GBvideos_clean.csv', 0.5)
     import sys

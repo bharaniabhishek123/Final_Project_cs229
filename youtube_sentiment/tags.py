@@ -107,6 +107,16 @@ def main():
     print('dev csv read')
     test = pd.read_csv('../data/youtube/GBvideos_clean_test.csv', encoding='utf8', error_bad_lines=False, usecols=fields)
     print('dev csv read')
+
+    # train = pd.read_csv('../data/youtube/USvideos_clean_train.csv', encoding='utf8', error_bad_lines=False, usecols=fields)
+    # print('train csv read')
+    # dev = pd.read_csv('../data/youtube/USvideos_clean_dev.csv', encoding='utf8', error_bad_lines=False,
+    #                   usecols=fields)
+    # print('dev csv read')
+    # test = pd.read_csv('../data/youtube/USvideos_clean_test.csv', encoding='utf8', error_bad_lines=False,
+    #                    usecols=fields)
+    # print('dev csv read')
+
     predict_categories(train, dev, test)
 
 
