@@ -1,0 +1,58 @@
+\section{Content Classification Approach}
+\label{sec:approach}
+We used $4$ supervised learning methods for the problems of sentiment and category classification.
+In both cases we deal with multi-class classification problems. In sentiment analysis, there are $3$ classes corresponding to negative, neutral and positive sentiments while in category classification there are $15$ classes corresponding to different categories.
+Theses techniques include Logistic Regression, Ridge classifier, Bernoulli Naive Bayes classifier and linear Support Vector Machine classifier.
+
+Bernoulli Naïve Bayes model is considered a common baseline for text classification due to its speed. 
+This model assumes conditional independence between the features given their class. This assumption leads to relatively straightforward analysis and efficient running time. Nevertheless, the performance is less desirable than other methods because the independence condition is usually not satisfied in real-world problems.
+
+%assumes a very strong assumption which assumes that the probability of each word occurrence in a comment is conditionally independent of the occurrence of other words in a comment. 
+%Given 𝑥 (i) = (𝑥1 (i), 𝑥2 (i), … 𝑥j (i)) being the training example (i), we first maximize the joint likelihood of the data: 
+%L (φy, φj|y=1, …, φj|y=k) = ∏i  p (𝑥 (i), y (i) ) = ∏i  ∏j p (𝑥j (i)| y(i)) * p (y(i)) 
+%
+%Maximizing the joint likelihood of the training data gives:
+%p (𝑥j (i)| y(i) = k) = φj|y=k = (∑I 1 {𝑥j (i) = 1∧ y(i)=k}) / (∑I 1 {y(i)=k})
+%p (y(i)=k) = φy=k = (∑I 1 {y(i)=k}) / m, where m = number of training examples.
+%
+%Then, class label will be based on the highest posterior probability: 
+%y = argmaxk (∏j φj|y (𝑥 j (i)) * φy=k  ) / (∑k ∏j φj|y (𝑥 j (i)) * φy=k) 	
+
+Multinomial Logistic Regression, also known as softmax regression is a generalization of Logistic Regression to more than $2$ classes.
+Matrix of parameters $\theta$ is found maximizing the log-likelihood function defined as:
+\begin{equation}
+ To be Filled
+	%ℓ(θ) = ∑i log ∏j  (exp(θjT 𝑥(i)) / ∑k exp(θkT 𝑥(i))1 {y( i)= l})
+\label{eq:softmax-likelihood}
+\end{equation}
+The probability of each data point is then computed as:
+\begin{equation}
+ To be Filled
+%p (y = k |𝑥;𝜃) = exp(θkT 𝑥(i)) / ∑j exp(θjT 𝑥(i))
+\label{eq:softmax-prob}
+\end{equation}
+
+Ridge classification is a generalization of regularized linear regression to classification problems. 
+The cost function to minimize if least squares error with L2 norm defined as:
+\begin{equation}
+To be filled
+%∑i  || 𝑥(i) W – y(i) ||2 2 + α || W ||2 2 , α ≥ 0
+\label{eq:ridge-cost}
+\end{equation}
+Once parameters are computed, continues predicted values are done according to a linear prediction function $X\theta$. These values are then converted into discrete class values through proper thresholds.
+
+
+The second term is used to penalize the matrix W being too large. In other words, if the matrix W takes on large values, regularized loss function will be penalized. This will encourage the fitted model to be a simple model rather than a complex model and usually this will prevent overfitting. 
+
+Linear Support Vector classifier (LinearSVC) applies a Support Vector Machine (SVM) with a linear Kernel. SVM is a maximum-margin classifier seeking to find a hyperplane $W^T X + b$ in a high-dimensional space that solves the following constrained optimization problem. 
+\begin{equation}
+To be filled
+\label{eq:svm}
+\end{equation}
+%has an objective to maximize the margin between the classes. This can be achieve by determining the parameters of the hyperplane (w and b) subject to wT x + b = 0. 
+%Given 𝑥 (i) = (𝑥1 (i), 𝑥2 (i), … 𝑥j (i)) being the training example (i) and the output y ∈ {−1, 1}, the goal is to solve the following problematic. For the SVM k, we wish to:
+%min (1/2 WkT Wk + c ∑i  ζk(i)) , where Wk ζk bk are the parameters for kth SVM 
+%wk,bk,ζk
+%subject to y(i) (WkT 𝑥 (i) + bk) ≥ 1 - ζk(i) and ζk(i) ≥ 0
+Support Vector Machines are inherently binary classifiers. To generalize them to the case of multi-class problems, there are two possible methods: one-vs-one and one-vs-all. The one-vs-one method builds a classifier for every two classes. The class of a point is then the one chosen by the most classifiers. The one-vs-all approach builds a classifier for each class compared to all the remaining classes. The class of a data point is the one whose classifier achieves the greatest margin. In our experiment, we apply the one-vs-all method. 
+ 

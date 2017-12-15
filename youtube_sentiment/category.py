@@ -8,14 +8,6 @@ from timeit import default_timer as timer
 from sklearn import decomposition
 import numpy as np
 import pandas as pd
-import sys
-
-
-def load_videos(videos):
-    fields = ['video_id', 'title', 'channel_title', 'category_id', 'tags', 'views', 'likes', 'dislikes', 'comment_total']
-    df = pd.read_csv(videos, encoding='utf8', error_bad_lines=False, usecols=fields)
-    print('df shape, ', df.shape)
-    return df
 
 
 def read_data(data, y_column):
@@ -92,6 +84,20 @@ def predict_categories(train, dev, test):
     print ('LinearSVC Dev Accuracy = ', dev_accuracy)
     test_accuracy = predict(test_comments, test_y, clf)
     print ('LinearSVC Test Accuracy = ', test_accuracy)
+
+
+def load_videos(videos):
+    fields = ['video_id', 'title', 'category_id', 'tags']
+    df = pd.read_csv(videos, encoding='utf8', error_bad_lines=False, usecols=fields)
+    return df
+
+
+def merge_video_csv(videos, comments, output_file):
+    print('merging %s and %s' % (videos, comments))
+    videos = load_videos(videos)
+    comments_data = pd.read_csv(comments, encoding='utf8', error_bad_lines=False)
+    full_data = pd.merge(comments_data, videos, how='inner', on='video_id')
+    full_data.to_csv(output_file, encoding='utf8')
 
 
 def main():

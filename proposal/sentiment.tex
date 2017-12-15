@@ -1,0 +1,27 @@
+\section{Sentiment Analysis}
+\label{sec:sentiment}
+
+\section{Label Generation}
+\label{sec:label}
+Our goal is to apply classification techniques on the YouTube data in order to understand whether a new comment bears positive or negative sentiment. The dataset in~\cite{youtubedata} contains $691407$ for $200$ movies. However, there are no labels classifying the comments about their sentiment. Considering the large number of comments, it would not be possible for use to manually label a reasonable fraction of this dataset. Consequently, we used TextBlob to generate the label sentiments. Note that TextBlob is based on Natural language Processing and estimates the sentiment for each comment independent from the rest of the comments in the dataset. For us, it replaces the burdensome task of manual labeling. TextBlob generates sentiment scores in the range of $(-1,1)$. We convert them into categorical data using the following equation. 
+
+\section{Feature Extraction}
+\label{sec:feature}
+We use TF-IDF to convert comments into feature vectors. In this technique, stop words are first removed and the remaining words are stemmed. Stop words are commonly used words such as \textit{the} which are filtered out before the analysis. Stemming is the process of reducing derived words to their common root known as stem. For instance, \textit{going} and \textit{goes} both come from the stem \textit{go}. TF (Term Frequency), counts the number of times a word has occurred in each document. However, the number of occurrences of words is in general higher for longer documents. Then, it is helpful to divide the number of word occurrences by the number of words in the document. The output of TF is a sparse matrix mapping documents to a normalized vector representing how many times each word has occurred in them. IDF (Inverse Document Frequency) accounts for the probability that a word happens in a document. Namely, some words are more likely than others to happen in a given corpus of documents. Then, we scale TF terms by a decreasing function of the number of occurrences of each word in the whole corpus.
+
+\section{Experiments and Evaluation}
+\label{sec:experiments}
+In order to measure the performance of different classification techniques on the YouTube data, we split the data from US comments into train and test subsets. To generate the train set, we randomly choose $80\%$ of the comments from each of the three categories. The remaining comments form the test set. We use $20\%$ of the GB comments as development set. 
+
+We ran three different classification techniques on the data, including Ridge Classifier, Bernoulli Naive Bayes and SVM. Table~\ref{tab:accuracy} shows the accuracy measured on test and dev sets. Naive Bayes classifier has the worst performance among all methods. This result is predictable as the conditional independence condition required by the Naive Bayes classifier is not satisfied in this dataset. In particular, the probability of two words happening in a comment given the comment category are not independent from one another.   
+
+\begin{table}%
+\begin{tabular}{lcr}
+Model & Test Error & Dev Error \\
+Ridge Classifier & $0.914$ & &0.905& \\
+Bernoulli NB & $0.709$ & $0.715$ \\
+LinearSVC & $0.956$ & $0.951$
+\end{tabular}
+\caption{Accuracy of different classification techniques on YouTube comments.}
+\label{tab:accuracy}
+\end{table}
