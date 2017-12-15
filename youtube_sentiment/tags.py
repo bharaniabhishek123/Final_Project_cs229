@@ -181,7 +181,7 @@ def main():
             test_acc_dict[classifier] = test_acc_list
 
     #plot(cat_num_list, train_acc_dict, 'Train Accuracy vs. Number of Categories', 'cat-num-train-acc.png')
-    #plot(cat_num_list, test_acc_dict, 'Test Accuracy per Number of Categories', 'cat-num-test-acc.png')
+    #plot(cat_num_list, test_acc_dict, 'Test Accuracy vs. Number of Categories', 'cat-num-test-acc.png')
 
 
 
